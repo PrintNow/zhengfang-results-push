@@ -40,19 +40,20 @@ return [
    > 除了带有 `*` 标记的表单需要填写，其它都不需要填。傻瓜式填写，不多讲述
 2. 新建完应用你会获得一个 **APP_TOKEN** 复制它，将它填到 `config.php` 第14行
 3. 然后不出意外会弹出一个二维码的模态框（如果没有，点击对应 应用的 **关注** 即可出现）
-   ![img/1.png](img/1.png)
+   ![1.png](https://i.loli.net/2021/01/12/9wCpExUluqn7I5V.png)
 4. 扫码关注公众号（这个二维码可以保存下来）
 5. 然后点击下方的 我的 -> 我的UID 获取UID，格式是 `UID_xxxxxxxxx`
-   ![img/2.png](img/2.png)
+   ![2.png](https://i.loli.net/2021/01/12/HZaVpP3Lne6zEFb.png)
 
 # 获取教务系统 JSESSIONID
 
 1. 打开教务系统
 2. 点击如图
 
-   ![img/3.jpg](./img/3.jpg)
+   ![3.jpg](https://i.loli.net/2021/01/12/mXGxTM84FKRLqBN.jpg)
 3. 复制 JSESSIONID
-   ![img/5.png](./img/5.png)
+   ![4.png](https://i.loli.net/2021/01/12/H6YfvAIw3kb29zi.png)
+   ![5.png](https://i.loli.net/2021/01/12/YoX5aRK6DjnIF4Z.png)
 
 # 使用方法
 
@@ -66,5 +67,9 @@ return [
    > 我们学校教务系统大概**每2分钟执行一次**，`JSESSIONID` 就不会失效，你们学校的教务系统，具体情况具体更改
     1. 命令行方法，执行 `php main.php -U "你的UID"`
     2. 网页方法，访问 `http://你的域名/main.php?UID=你的UID`
+
+# 运行结果
+
+![新版正方教务系统 成绩主动查询 微信推送运行结果](https://i.loli.net/2021/01/12/k4OfriNGUB26gdL.jpg)
 
 [http://wxpusher.zjiecode.com/admin/app/list]: http://wxpusher.zjiecode.com/admin/app/list
