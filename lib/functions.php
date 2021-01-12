@@ -6,42 +6,28 @@
  * Email: <chenwenzhou@aliyun.com>
  */
 
-//成绩查询API
-define("ResultQueryAPI", "http://教务系统域名/jwglxt/cjcx/cjcx_cxDgXscj.html?doType=query&gnmkdm=N305005");
-//如果你的教务系统强制使用  https  请将 http 末尾加一个 s
-//不知道gnmkdm
-
-//查询那个学年
-//2019 表示的是 2019~2020 学年
-define("XNM", "2019");
-
-//查询哪个学期
-//3：上学期
-//12：下学期
-define("XQM", "12");
-
-
 /**
  * 展示指定路径下的所有文件
- * @param string $dir           展示哪个路径下的文件
- * @param array  $ignoreFile    忽略的文件，是一个数组
+ * @param string $dir 展示哪个路径下的文件
+ * @param array $ignoreFile 忽略的文件，是一个数组
  * @return array
  */
-function fileShow($dir='./', $ignoreFile=[]){
+function fileShow($dir = './', $ignoreFile = [])
+{
     $handle = opendir($dir);
     $arr = [];
 
-    while($file = readdir($handle)){
-        if($file === '..' && $file === '.') continue;
+    while ($file = readdir($handle)) {
+        if ($file === '..' || $file === '.') continue;
 
         //如果该文件存在于排除名单
         //则跳过本次循环
-        if(in_array($file, $ignoreFile)) continue;
+        if (in_array($file, $ignoreFile)) continue;
 
-        $f = $dir.'/'.$file;
+        $f = $dir . '/' . $file;
 
         //判断是否为文件
-        if(is_file($f)){
+        if (is_file($f)) {
             //是的话压入数组
             array_push($arr, $file);
         }
@@ -50,6 +36,12 @@ function fileShow($dir='./', $ignoreFile=[]){
     return $arr;
 }
 
+/**
+ * 成绩标题
+ * @param int $XN 哪个学年
+ * @param int $XQ 哪个学期
+ * @return string
+ */
 function chengji_title($XN, $XQ)
 {
     $XN = intval($XN);
@@ -81,10 +73,14 @@ function parseScore($arr = [])
     return $data;
 }
 
-
+/**
+ * 创建缓存文件
+ * @param $path
+ * @param $data
+ */
 function score_tmp($path, $data)
 {
-    file_put_contents($path, $data) or die("无文件写入权限，请检查 userConf 文件夹权限");
+    file_put_contents($path, $data) or die("无文件写入权限，请检查 userConf 文件夹权限" . PHP_EOL);
 }
 
 
@@ -138,11 +134,11 @@ function create_or_update_conf($UID, $JSESSIONID)
     ], $uCTmp);
 
     //新建用户相关信息配置文件
-    file_put_contents(dirname(__DIR__) . "/userConf/{$UID}.php", $uCTmp) or die("无文件写入权限，请检查 userConf 文件夹权限");
+    file_put_contents(dirname(__DIR__) . "/userConf/{$UID}.php", $uCTmp) or die("无文件写入权限，请检查 userConf 文件夹权限" . PHP_EOL);
 }
 
 /**
- * SERVER CHAN 微信推送
+ * SERVER CHAN 微信推送（本程序未使用，需要的话自己实现）
  * @param string $text 消息标题，最长为256，必填。
  * @param string $desp 消息内容，最长64Kb，可空，支持MarkDown。
  * @param string $key 获取方式：http://sc.ftqq.com/?c=code

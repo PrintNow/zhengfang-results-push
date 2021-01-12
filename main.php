@@ -6,13 +6,22 @@
  * Email: <chenwenzhou@aliyun.com>
  */
 
+
+#--------------------------------------------#
+//使用本程序前，请先配置 lib/config.php 相关设置
+//使用本程序前，请先配置 lib/config.php 相关设置
+//使用本程序前，请先配置 lib/config.php 相关设置
+#--------------------------------------------#
+
+
 include __DIR__ . "/lib/functions.php";
 include __DIR__ . "/lib/WxPusher.php";
 $config = include __DIR__ . "/lib/config.php";
 
-//请先配置  Lib/config.php  第14行 APP_TOKEN
+//实例化 WxPusher
 $WxPusher = new WxPusher($config['WxPusherConfig']['APP_TOKEN']);
 
+//初始化相关 变量
 $UID = '';
 $JSESSIONID = '';
 $AlwaysPush = 'false';
@@ -20,16 +29,16 @@ $AlwaysPush = 'false';
 if (is_cli() && isset($argv)) {
     $param = getopt('U:S:P:');
 
-    if(isset($param['U'])){
+    if (isset($param['U'])) {
         $UID = $param['U'];
     }
-    if(isset($param['S'])){
+    if (isset($param['S'])) {
         $JSESSIONID = $param['S'];
     }
-    if(isset($param['P'])){
+    if (isset($param['P'])) {
         $AlwaysPush = $param['P'];
     }
-}else{
+} else {
     //获取向谁推送成绩信息 UID
     $UID = get('UID', '');
 
@@ -44,7 +53,6 @@ if (is_cli() && isset($argv)) {
 
 $userConfPath = __DIR__ . "/userConf/{$UID}.php";
 $resultTmpPath = __DIR__ . "/resultTmp/{$UID}.php";
-
 
 //如果不存在用户相关信息配置文件，就新建一个
 if (!file_exists($userConfPath)) {
@@ -75,9 +83,9 @@ include $userConfPath;
 $WxPusher->setUid(_UID_);
 
 //查询成绩信息
-$queryScore = json_decode(curlPost(0, ResultQueryAPI, [
-    'xnm' => XNM,//详见 lib/functions.php 第14行
-    'xqm' => XQM,//3 上学期  12 下学期
+$queryScore = json_decode(curlPost(0, $config['URL'], [
+    'xnm' => $config['XNM'],//哪个学年。详见 lib/functions.php 第14行
+    'xqm' => $config['XQM'],//哪个学期。//详见 lib/functions.php 第14行
     'queryModel.showCount' => 100,//展示多少个数据
     'queryModel.currentPage' => 1,//第几页
     'queryModel.sortOrder' => 'asc'//排序方式
@@ -110,30 +118,37 @@ if (!file_exists($resultTmpPath)) {
     score_tmp($resultTmpPath, time());
 }
 
-if (md5($resultJson) === md5(file_get_contents($resultTmpPath)) && $AlwaysPush==='false') {
+if (md5($resultJson) === md5(file_get_contents($resultTmpPath)) && $AlwaysPush === 'false') {
     die("成绩无变化，不推送信息" . PHP_EOL);
-} else {
-    //缓存成绩信息
-    score_tmp($resultTmpPath, $resultJson);
-
-    $enmsg = function () use ($pScore) {
-        $t = '';
-        $t .= chengji_title(XNM, XQM) . PHP_EOL . PHP_EOL;//标题
-
-        foreach ($pScore as $k => $v) {
-            $t .= "{$v['kcmc']}：{$v['cj']}\n";
-        }
-
-        $t .= PHP_EOL . "数据更新时间：" . date("Y-m-d H:i:s");
-
-        return $t;
-    };
-
-    $res = json_decode($WxPusher->sendMsg(1, $enmsg()), true);
-
-    if ($res['code'] === 1000) {
-        die("成绩推送成功" . PHP_EOL);
-    } else {
-        die("成绩推送失败，原因：{$res['msg']}" . PHP_EOL);
-    }
 }
+
+
+//缓存成绩信息
+score_tmp($resultTmpPath, $resultJson);
+
+
+/**
+ * 拼接成绩信息
+ * @return string
+ */
+$enMsg = function () use ($pScore, $config) {
+    $t = '';
+    $t .= chengji_title($config['XNM'], $config['XQM']) . PHP_EOL . PHP_EOL;//标题
+
+    foreach ($pScore as $k => $v) {
+        $t .= "{$v['kcmc']}：{$v['cj']}\n";
+    }
+
+    $t .= PHP_EOL . "数据更新时间：" . date("Y-m-d H:i:s");
+
+    return $t;
+};
+
+//判断是否推送成功
+$res = json_decode($WxPusher->sendMsg(1, $enMsg()), true);
+
+if ($res['code'] === 1000) {
+    die("成绩推送成功" . PHP_EOL);
+}
+
+die("成绩推送失败，原因：{$res['msg']}" . PHP_EOL);
